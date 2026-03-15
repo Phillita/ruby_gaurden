@@ -17,8 +17,9 @@ module RubyBox
 
       private
 
-      def binds(target, proc = Proc.new)
-        bindings << [target, proc]
+      def binds(target, proc = nil, &block)
+        actual_proc = proc || block || Proc.new {}
+        bindings << [target, actual_proc]
       end
     end
 
@@ -26,14 +27,16 @@ module RubyBox
       super
 
       self.class.bindings.each do |target, proc|
-        bind target, proc { |*args| instance_exec(*args, &proc) }
+        bind target, lambda { |*args|
+          instance_exec(*args, &proc)
+        }
       end
     end
 
     private
 
-    def bind(target, proc = Proc.new)
-       context.attach(target, proc)
+    def bind(target, proc = Proc.new {})
+      context.attach(target, proc)
     end
   end
 end

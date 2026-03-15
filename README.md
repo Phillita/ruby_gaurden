@@ -44,7 +44,7 @@ class MySandbox < RubyBox::Metal
     # Some boilerplate code
     class PlayThing
       attr_reader :name
-    
+
       def initialize(name)
         @name = name
       end
@@ -65,7 +65,7 @@ untrusted_program = <<-RUBY
   $global_state = 'tainted'
 
   puts "Hello, world"
-  
+
   car = PlayThing.new("Car")
   car.name
 RUBY
@@ -99,6 +99,11 @@ The development dependencies of this gem are managed using [Bundler](https://rub
 After checking out the repo, run `bundle install` to install dependencies. Then, run `bundle exec rake spec` to run the tests. You can also run `bundle exec rake console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [RubyGems](https://rubygems.org/gems/ruby_box).
+
+## Upcoming Development Tasks
+
+- [x] Update opal and mini_racer to latest
+- [ ] Add rubocop + fix linter warnings
 
 ## Contributing
 

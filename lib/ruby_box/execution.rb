@@ -7,6 +7,8 @@ module RubyBox
   module Execution
     extend ActiveSupport::Concern
 
+    DEFAULT_MAXIMUM_EXECUTION_TIME = 1000
+
     class_methods do
       def maximum_execution_time
         @maximum_execution_time ||= begin
@@ -48,7 +50,14 @@ module RubyBox
     private
 
     def context
-      @context ||= MiniRacer::Context.new(snapshot: self.class.snapshot, timeout: maximum_execution_time_ms)
+      return @context if @context
+
+      @context ||= MiniRacer::Context.new(
+        # snapshot: self.class.snapshot, # Snapshots don't work in the latest versions of opal.
+        timeout: maximum_execution_time_ms || DEFAULT_MAXIMUM_EXECUTION_TIME
+      )
+      @context.eval self.class.send(:snapshot_source)
+      @context
     end
 
     def eval_compiled_source(source)
