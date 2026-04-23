@@ -4,6 +4,12 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
 plugins:
   - rubocop-rake
   - rubocop-rspec
