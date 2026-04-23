@@ -9,10 +9,6 @@ module RubyBox
     extend ActiveSupport::Concern
 
     included do
-      requires 'native'
-      requires 'singleton'
-      requires 'json'
-
       binds('__rb_exit') { |status| raise Error, "Exit with status #{status.inspect}" }
       binds('__rb_stdout_write') { |data| stdout << data }
       binds('__rb_stderr_write') { |data| stderr << data }
@@ -131,14 +127,14 @@ module RubyBox
     end
 
     def handle_bridge_result(result)
-      return if result.nil?
+      return unless result.is_a?(Hash)
 
-      if result['isCaught']
+      if result.fetch('isCaught', false)
         class_name, message = result_value(result)
         raise BoxedError[class_name], message
-      else
-        result_value(result)
       end
+
+      result_value(result)
     rescue MiniRacer::RuntimeError, StandardError => e
       raise e if e.is_a?(RubyBox::Error)
 

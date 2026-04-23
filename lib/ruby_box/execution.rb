@@ -20,18 +20,34 @@ module RubyBox
         @maximum_memory ||= superclass.maximum_memory if superclass.respond_to?(:maximum_memory)
       end
 
-      private
-
-      def snapshot_source
-        raise NotImplementedError
-      end
-
       def times_out_in(seconds)
         @maximum_execution_time = seconds
       end
 
       def limits_memory_to(bytes)
         @maximum_memory = bytes
+      end
+
+      def context_pool
+        @context_pool ||= ::Queue.new
+      end
+
+      def warm_up(size = 1)
+        size.times { context_pool.push(create_context) }
+      end
+
+      def create_context
+        # Use a large timeout (30s) for initialization to ensure the large Opal
+        # runtime loads even if the user set a small timeout for their code.
+        MiniRacer::Context.new(
+          timeout: (maximum_execution_time || DEFAULT_MAXIMUM_EXECUTION_TIME) * 1000,
+          max_memory: maximum_memory || DEFAULT_MAX_MEMORY
+        ).tap do |ctx|
+          # We use a secondary timeout for the init phase. If this fails,
+          # the context is not returned/tapped, preventing a "broken"
+          # context from entering the pool or being used by an instance.
+          ctx.eval(send(:initialization_source), timeout: 30_000)
+        end
       end
     end
 
@@ -51,12 +67,9 @@ module RubyBox
 
     def context
       @context ||= begin
-        ctx = MiniRacer::Context.new(
-          timeout: maximum_execution_time_ms || DEFAULT_MAXIMUM_EXECUTION_TIME,
-          max_memory: maximum_memory || DEFAULT_MAX_MEMORY
-        )
-        ctx.eval self.class.send(:snapshot_source)
-        ctx
+        self.class.context_pool.pop(true)
+      rescue ThreadError
+        self.class.create_context
       end
     end
 

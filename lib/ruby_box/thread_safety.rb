@@ -13,7 +13,7 @@ module RubyBox
         synchronize { super }
       end
 
-      def snapshot_source
+      def initialization_source
         synchronize { super }
       end
 
@@ -61,14 +61,6 @@ module RubyBox
     end
 
     def execute(...)
-      synchronize { super }
-    end
-
-    def stdout
-      synchronize { super }
-    end
-
-    def stderr
       synchronize { super }
     end
 

@@ -116,8 +116,11 @@ RSpec.describe RubyBox do
       expect(sandbox_class.compiled_cache.size).to eq(2)
 
       sandbox.execute('3')
-      expect(sandbox_class.compiled_cache.size).to eq(1)
-      expect(sandbox_class.compiled_cache.keys).to eq(['3'])
+
+      # With MAX_CACHE_SIZE 2 and 10% pruning (min 1), the oldest key '1' should be
+      # evicted, leaving '2' and '3' in the cache.
+      expect(sandbox_class.compiled_cache.size).to eq(2)
+      expect(sandbox_class.compiled_cache.keys).to eq(%w[2 3])
     end
   end
 end

@@ -37,9 +37,12 @@ module RubyBox
         @executes << source
       end
 
-      def snapshot_source
-        @snapshot_source ||= begin
+      def initialization_source
+        @initialization_source ||= begin
           builder = Opal::Builder.new compiler_options: { arity_check: true, dynamic_require_severity: :error }
+          builder.build 'opal'
+
+          # Ensure the builder can resolve requirements by including the gems
           inherited_values(:@uses).uniq.each { |g| builder.use_gem g }
           inherited_values(:@requires).uniq.each { |p| builder.build p }
           inherited_values(:@executes).each { |s| builder.build_str s, '(executes)' }
@@ -66,7 +69,13 @@ module RubyBox
       # Use the Compiler directly for the execution source to avoid V8 "Genesis" crashes.
       js = Opal::Compiler.new(source, file: '(execute)', arity_check: true).compile
 
-      self.class.compiled_cache.clear if self.class.compiled_cache.size >= MAX_CACHE_SIZE
+      if self.class.compiled_cache.size >= MAX_CACHE_SIZE
+        # Prune the oldest 10% of entries (at least 1) to avoid performance cliffs.
+        # Since Ruby Hashes maintain insertion order, this behaves like FIFO.
+        amount_to_prune = [1, MAX_CACHE_SIZE / 10].max
+        keys_to_purge = self.class.compiled_cache.keys.first(amount_to_prune)
+        keys_to_purge.each { |k| self.class.compiled_cache.delete(k) }
+      end
       self.class.compiled_cache[source] = js
     rescue SyntaxError => e
       raise CompilationError, e.message
