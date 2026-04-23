@@ -1,25 +1,19 @@
-require 'ruby_box'
+# frozen_string_literal: true
 
+require 'ruby_box'
 require 'active_support/concern'
-require 'thread'
 require 'monitor'
 
 module RubyBox
   module ThreadSafety
     extend ActiveSupport::Concern
 
-    SEMAPHORE = Mutex.new
-
     class_methods do
       def maximum_execution_time
         synchronize { super }
       end
 
-      def builder
-        synchronize { super }
-      end
-
-      def snapshot
+      def initialization_source
         synchronize { super }
       end
 
@@ -29,36 +23,36 @@ module RubyBox
 
       private
 
-      def times_out_in(*)
+      def times_out_in(...)
         synchronize { super }
       end
 
-      def uses(*)
+      def uses(...)
         synchronize { super }
       end
 
-      def requires(*)
+      def requires(...)
         synchronize { super }
       end
 
-      def executes(*)
+      def executes(...)
         synchronize { super }
       end
 
-      def binds(*)
+      def binds(...)
         synchronize { super }
       end
 
-      def exposes(*)
+      def exposes(...)
         synchronize { super }
       end
 
-      def synchronize
-        monitor.synchronize { yield }
+      def synchronize(&)
+        monitor.synchronize(&)
       end
 
       def monitor
-        SEMAPHORE.synchronize { @monitor ||= Monitor.new }
+        @monitor ||= Monitor.new
       end
     end
 
@@ -66,32 +60,16 @@ module RubyBox
       synchronize { super }
     end
 
-    def builder
+    def execute(...)
       synchronize { super }
     end
 
-    def execute(*)
-      synchronize { super }
-    end
-
-    def stdout
-      synchronize { super }
-    end
-
-    def stderr
-      synchronize { super }
-    end
-
-    private
-
-    def synchronize
-      monitor.synchronize { yield }
+    def synchronize(&)
+      monitor.synchronize(&)
     end
 
     def monitor
-      SEMAPHORE.synchronize { @monitor ||= Monitor.new }
+      @monitor ||= Monitor.new
     end
   end
 end
-
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ruby_box'
 
 module RubyBox
@@ -8,8 +10,8 @@ module RubyBox
     include Bridging
     include ThreadSafety
 
-    def self.execute(*args, &block)
-      new.execute(*args, &block)
+    def self.execute(...)
+      new.execute(...)
     end
   end
 end

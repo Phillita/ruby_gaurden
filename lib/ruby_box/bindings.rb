@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ruby_box'
 
 module RubyBox
@@ -6,19 +8,17 @@ module RubyBox
 
     class_methods do
       def bindings
-        @bindings ||= begin
-          if superclass.respond_to?(:bindings)
-            superclass.bindings.dup
-          else
-            []
-          end
-        end
+        @bindings ||= if superclass.respond_to?(:bindings)
+                        superclass.bindings.dup
+                      else
+                        []
+                      end
       end
 
       private
 
       def binds(target, proc = nil, &block)
-        actual_proc = proc || block || Proc.new {}
+        actual_proc = proc || block || -> {}
         bindings << [target, actual_proc]
       end
     end
@@ -33,9 +33,7 @@ module RubyBox
       end
     end
 
-    private
-
-    def bind(target, proc = Proc.new {})
+    def bind(target, proc = -> {})
       context.attach(target, proc)
     end
   end
