@@ -18,7 +18,7 @@ module RubyBox
       private
 
       def binds(target, proc = nil, &block)
-        actual_proc = proc || block || proc {}
+        actual_proc = proc || block || -> {}
         bindings << [target, actual_proc]
       end
     end
@@ -33,7 +33,7 @@ module RubyBox
       end
     end
 
-    def bind(target, proc = proc {})
+    def bind(target, proc = -> {})
       context.attach(target, proc)
     end
   end

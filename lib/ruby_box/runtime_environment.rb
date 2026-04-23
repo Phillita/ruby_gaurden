@@ -1,5 +1,6 @@
-require 'ruby_box'
+# frozen_string_literal: true
 
+require 'ruby_box'
 require 'active_support/concern'
 require 'opal'
 
@@ -7,69 +8,68 @@ module RubyBox
   module RuntimeEnvironment
     extend ActiveSupport::Concern
 
+    MAX_CACHE_SIZE = 1000
+
     included do
       uses 'opal'
       requires 'opal'
     end
 
     class_methods do
-      def builder
-        @builder ||= begin
-          if superclass.respond_to?(:builder)
-            superclass.builder.dup
-          else
-            Opal::Builder.new compiler_options: { arity_check: true, dynamic_require_severity: :error }
-          end
-        end
+      def compiled_cache
+        @compiled_cache ||= {}
       end
 
       private
 
       def uses(*gem_names)
-        gem_names.each { |gem_name| builder.use_gem gem_name }
-      rescue SyntaxError => error
-        raise CompilationError, error.message
+        @uses ||= []
+        @uses += gem_names
       end
 
       def requires(*paths)
-        paths.each { |path| builder.build path }
-      rescue SyntaxError => error
-        raise CompilationError, error.message
+        @requires ||= []
+        @requires += paths
       end
 
       def executes(source)
-        builder.build_str source, '(executes)'
-      rescue SyntaxError => error
-        raise CompilationError, error.message
+        @executes ||= []
+        @executes << source
       end
 
       def snapshot_source
-        builder.to_s
+        @snapshot_source ||= begin
+          builder = Opal::Builder.new compiler_options: { arity_check: true, dynamic_require_severity: :error }
+          inherited_values(:@uses).uniq.each { |g| builder.use_gem g }
+          inherited_values(:@requires).uniq.each { |p| builder.build p }
+          inherited_values(:@executes).each { |s| builder.build_str s, '(executes)' }
+
+          builder.to_s
+        rescue SyntaxError, StandardError => e
+          raise CompilationError, e.message
+        end
+      end
+
+      def inherited_values(ivar)
+        ancestors.reverse.flat_map do |ancestor|
+          ancestor.instance_variable_defined?(ivar) ? ancestor.instance_variable_get(ivar) : []
+        end
       end
     end
 
-    def builder
-      @builder ||= self.class.builder.dup
-    end
-
     def execute(source)
-      execute_newly_processed_dependencies { builder.build_str source, '(execute)' }
-    rescue SyntaxError => error
-      raise CompilationError, error.message
+      js = self.class.compiled_cache[source] || compile_and_cache(source)
+      eval_compiled_source(js)
     end
 
-    private
+    def compile_and_cache(source)
+      # Use the Compiler directly for the execution source to avoid V8 "Genesis" crashes.
+      js = Opal::Compiler.new(source, file: '(execute)', arity_check: true).compile
 
-    def execute_newly_processed_dependencies
-      value = nil
-      capture_newly_processed_dependencies { yield }.each { |dependency| value = eval_compiled_source dependency.source }
-      value
-    end
-
-    def capture_newly_processed_dependencies
-      processed_was = builder.processed.dup
-      yield
-      builder.processed - processed_was
+      self.class.compiled_cache.clear if self.class.compiled_cache.size >= MAX_CACHE_SIZE
+      self.class.compiled_cache[source] = js
+    rescue SyntaxError => e
+      raise CompilationError, e.message
     end
   end
 end

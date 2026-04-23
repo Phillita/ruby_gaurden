@@ -14,11 +14,16 @@ gem 'ruby_box'
 
 And then execute:
 
-    $ bundle
+```bash
+bundle
+
+```
 
 Or install it yourself as:
 
-    $ gem install ruby_box
+```bash
+gem install ruby_box
+```
 
 ## Usage
 
@@ -26,7 +31,7 @@ Or install it yourself as:
 # `RubyBox::Metal` is the sandbox base class. It has only the bare essentials to get the environment working.
 class MySandbox < RubyBox::Metal
   # Code in the sandbox will block at most one second
-  times_out_in 1.second
+  times_out_in 1 # Seconds
 
   # Makes the opal gem available for requiring inside the sandbox
   uses 'opal'
@@ -76,6 +81,19 @@ my_sandbox.execute(untrusted_program) #=> "Car"
 my_sandbox.execute('PlayThing.add(2,7)') #=> 9
 my_sandbox.stdout #=> ["Hello, world\n"]
 
+# You can also call top-level methods directly using #call
+my_sandbox.execute('def sum(a, b); a + b; end')
+my_sandbox.call(:sum, 10, 20) #=> 30
+
+### When to use #call vs #execute
+
+While both methods run code inside the sandbox, they serve different purposes:
+
+*   **Use `#execute`** for running arbitrary scripts, defining classes/methods, or setting up state. It involves a compilation step (Ruby to JavaScript) which, while cached, is more "heavyweight."
+*   **Use `#call`** to invoke specific methods that already exist in the sandbox. It is faster because it skips the compiler and directly targets the V8 runtime. It also handles the serialization of arguments automatically, making it the safest way to pass host data into the sandbox.
+
+A common pattern is to use `executes` at the class level to define your API, and then use `#call` at runtime to trigger it.
+
 # Every instance of the sandbox is isolated
 another_sandbox = MySandbox.new
 another_sandbox.execute('$global_state') #=> 1337
@@ -90,6 +108,31 @@ another_sandbox.execute('nil.no_method') #=> RubyBox::BoxedError::BoxedNoMethodE
 # You can determine if you are in a sandbox using `RubyBox.boxed?` and `RubyBox.current`
 RubyBox.boxed? #=> false
 RubyBox.current #=> nil
+
+### Inheritance
+
+# Sandboxes inherit configuration (uses, requires, executes, exposes) from their parents.
+class BaseSandbox < RubyBox::Metal
+  executes '$base_initialized = true'
+end
+
+class SpecializedSandbox < BaseSandbox
+  executes '$special_initialized = true'
+end
+
+box = SpecializedSandbox.new
+box.execute('$base_initialized')    #=> true
+box.execute('$special_initialized') #=> true
+```
+
+## Performance & Caching
+
+RubyBox caches the compiled JavaScript of every snippet passed to `execute`. This drastically improves performance for repeated calls.
+
+To prevent memory exhaustion in long-running processes, the cache is limited to `MAX_CACHE_SIZE` (default 1000) entries per sandbox class. When the limit is reached, the cache is cleared.
+
+```ruby
+RubyBox::RuntimeEnvironment::MAX_CACHE_SIZE #=> 1000
 ```
 
 ## Development
@@ -103,7 +146,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Upcoming Development Tasks
 
 - [x] Update opal and mini_racer to latest
-- [ ] Add rubocop + fix linter warnings
+- [ ] ~~Add rubocop + fix linter warnings~~ (Already exists)
 
 ## Contributing
 

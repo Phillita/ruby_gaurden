@@ -17,11 +17,11 @@ module RubyBox
 
   module_function
 
-  def self.boxed?
+  def boxed?
     false
   end
 
-  def self.current
+  def current
     nil
   end
 
