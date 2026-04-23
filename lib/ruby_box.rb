@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ruby_box/version'
 
 module RubyBox
@@ -13,7 +15,7 @@ module RubyBox
   autoload :ThreadSafety, 'ruby_box/thread_safety'
   autoload :TimeoutError, 'ruby_box/timeout_error'
 
-  extend self
+  module_function
 
   def self.boxed?
     false
@@ -23,7 +25,7 @@ module RubyBox
     nil
   end
 
-  def execute(*args, &block)
-    Metal.execute(*args, &block)
+  def execute(...)
+    Metal.execute(...)
   end
 end
