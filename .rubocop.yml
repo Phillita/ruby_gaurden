@@ -1,2 +1,6 @@
 AllCops:
   NewCops: enable
+
+plugins:
+  - rubocop-rake
+  - rubocop-rspec
