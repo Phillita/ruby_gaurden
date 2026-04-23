@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new(:spec)
 
+desc 'Run console with RubyBox loaded'
 task :console do
   require 'pry'
   require 'ruby_box'
@@ -10,6 +13,7 @@ task :console do
   Pry.start
 end
 
+desc 'Run benchmarks'
 task :benchmark do
   require 'benchmark'
   require 'benchmark/ips'
@@ -19,7 +23,7 @@ task :benchmark do
     x.report('native loop') do
       i = 0
 
-      100000.times do |idx|
+      100_000.times do |idx|
         i += idx
       end
     end
@@ -28,7 +32,7 @@ task :benchmark do
       RubyBox.execute <<-RUBY
         i = 0
 
-        100000.times do |idx|
+        100_000.times do |idx|
           i += idx
         end
       RUBY
@@ -36,5 +40,5 @@ task :benchmark do
   end
 end
 
-task :test => [:spec]
-task :default => [:test]
+task test: [:spec]
+task default: [:test]
