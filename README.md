@@ -1,6 +1,6 @@
 # RubyGaurden
 
-RubyGaurden allows the execution of untrusted Ruby code safely in a sandbox (or guarden). It works by compiling Ruby code to JavaScript using [`opal`](https://github.com/opal/opal) and executing it in [Google's V8 Engine](https://github.com/cowboyd/libv8) with some help from [`mini_racer`](https://github.com/discourse/mini_racer).
+RubyGaurden allows the execution of untrusted Ruby code safely in a walled garden. It works by compiling Ruby code to JavaScript using [`opal`](https://github.com/opal/opal) and executing it in [Google's V8 Engine](https://github.com/cowboyd/libv8) with some help from [`mini_racer`](https://github.com/discourse/mini_racer).
 
 ## Installation
 
@@ -27,7 +27,7 @@ gem install ruby_gaurden
 
 ```ruby
 # `RubyGaurden::Gaurden` is the sandbox base class. It has only the bare essentials to get the environment working.
-class MySandbox < RubyGaurden::Gaurden
+class MySandbox < RubyGaurden::Bed
   # Code in the sandbox will block at most one second
   times_out_in 1 # Seconds
 
@@ -100,11 +100,11 @@ another_sandbox.execute('$global_state') #=> 1337
 another_sandbox.execute('warn "This looks dangerous"')
 another_sandbox.stderr #=> ["This looks dangerous\n"]
 
-# Exceptions comes through as subclasses of RubyGaurden::GaurdenedError
-another_sandbox.execute('nil.no_method') #=> RubyGaurden::GaurdenedError::GaurdenedNoMethodError
+# Exceptions comes through as subclasses of RubyGaurden::BedError
+another_sandbox.execute('nil.no_method') #=> RubyGaurden::BedError::BedNoMethodError
 
-# You can determine if you are in a sandbox using `RubyGaurden.gaurdened?` and `RubyGaurden.current`
-RubyGaurden.gaurdened? #=> false
+# You can determine if you are in a sandbox using `RubyGaurden.planted?` and `RubyGaurden.current`
+RubyGaurden.planted? #=> false
 RubyGaurden.current #=> nil
 
 ### Inheritance
@@ -140,14 +140,9 @@ After checking out the repo, run `bundle install` to install dependencies. Then,
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [RubyGems](https://rubygems.org/gems/ruby_gaurden).
 
-## Upcoming Development Tasks
-
-- [x] Update opal and mini_racer to latest
-- [ ] ~~Add rubocop + fix linter warnings~~ (Already exists)
-
 ## Contributing
 
-Bug reports and pull requests are welcome on [GitHub](https://github.com/anarchocurious/ruby_gaurden).
+Bug reports and pull requests are welcome on [GitHub](https://github.com/Phillita/ruby_gaurden).
 
 
 ## License
