@@ -22,16 +22,23 @@ module RubyGaurden
 
       private
 
+      # Declares a gem dependency to be loaded into the sandbox.
+      # @param gem_names [Array<String>] List of gem names.
       def uses(*gem_names)
         @uses ||= []
         @uses += gem_names
       end
 
+      # Declares a file or feature to be required within the sandbox.
+      # @param paths [Array<String>] List of paths to require.
       def requires(*paths)
         @requires ||= []
         @requires += paths
       end
 
+      # Defines Ruby code to be executed during the initialization of every sandbox instance.
+      # Useful for setting up global state or helper classes.
+      # @param source [String] The Ruby code to execute during boot.
       def executes(source)
         @executes ||= []
         @executes << source
@@ -60,11 +67,20 @@ module RubyGaurden
       end
     end
 
+    # Executes a string of Ruby code within the sandbox instance.
+    # Results are cached by the source string to optimize repeated calls.
+    # @param source [String] The Ruby code to execute.
+    # @return [Object] The result of the execution, translated to host Ruby objects.
+    # @raise [CompilationError] if the code has syntax errors.
+    # @raise [ExecutionError] if the code raises an exception during runtime.
     def execute(source)
       js = self.class.compiled_cache[source] || compile_and_cache(source)
       eval_compiled_source(js)
     end
 
+    # Compiles Ruby source to JavaScript and clears the cache if the limit is reached.
+    # @param source [String] Ruby source code.
+    # @return [String] Compiled JavaScript.
     def compile_and_cache(source)
       # Use the Compiler directly for the execution source to avoid V8 "Genesis" crashes.
       js = Opal::Compiler.new(source, file: '(execute)', arity_check: true).compile

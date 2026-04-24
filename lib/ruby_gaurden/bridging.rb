@@ -76,6 +76,10 @@ module RubyGaurden
     end
 
     class_methods do
+      # Exposes host methods to the sandbox, allowing sandboxed code to call
+      # back into the main Ruby process safely via JSON serialization.
+      # @param method_names [Array<Symbol, String>] Methods on the host to expose.
+      # @note Blocks are not supported for bridged methods.
       def exposes(*method_names)
         method_names.each do |method_name|
           handle = "__rb_expose_#{method_name}"
@@ -92,19 +96,30 @@ module RubyGaurden
       end
     end
 
+    # Returns the accumulated stdout produced by the sandbox.
+    # @return [Array<String>]
     def stdout
       @stdout ||= []
     end
 
+    # Returns the accumulated stderr produced by the sandbox.
+    # @return [Array<String>]
     def stderr
       @stderr ||= []
     end
 
+    # Clears the IO buffers (stdout and stderr).
     def reset_io!
       @stdout = []
       @stderr = []
     end
 
+    # Directly invokes a Ruby method defined inside the sandbox.
+    # This bypasses the Ruby-to-JS compilation step for the call itself.
+    # @param method_name [Symbol, String] The name of the method to call.
+    # @param args [Array] Arguments to pass to the method.
+    # @return [Object] The result of the method call.
+    # @raise [BedError] if the method raises an exception inside the sandbox.
     def call(method_name, *args)
       # We use JSON to move data across the bridge to avoid V8/Ruby object mapping overhead
       # and to ensure Opal objects are correctly initialized.

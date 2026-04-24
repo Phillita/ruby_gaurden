@@ -20,14 +20,20 @@ module RubyGaurden
         @maximum_memory ||= superclass.maximum_memory if superclass.respond_to?(:maximum_memory)
       end
 
+      # Sets the maximum time a script can execute before being terminated.
+      # @param seconds [Integer, Float] Time in seconds.
       def times_out_in(seconds)
         @maximum_execution_time = seconds
       end
 
+      # Sets the maximum memory the V8 context can consume.
+      # @param bytes [Integer] Memory limit in bytes.
       def limits_memory_to(bytes)
         @maximum_memory = bytes
       end
 
+      # Accesses the thread-safe pool of pre-warmed V8 contexts.
+      # @return [Thread::Queue]
       def context_pool
         @context_pool ||= ::Queue.new
       end
