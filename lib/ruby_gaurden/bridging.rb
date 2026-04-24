@@ -20,7 +20,7 @@ module RubyGaurden
         require 'json'
 
         module RubyGaurden
-          VERSION = #{VERSION.inspect}
+          VERSION = #{RubyGaurden::VERSION.inspect}
 
           class CurrentBedProxy
             include Singleton

@@ -38,10 +38,15 @@ module RubyGaurden
         @context_pool ||= ::Queue.new
       end
 
+      # Pre-warms a specified number of V8 contexts and adds them to the pool.
+      # @param size [Integer] The number of contexts to create.
       def warm_up(size = 1)
         size.times { context_pool.push(create_context) }
       end
 
+      # Creates a fresh V8 context and evaluates the initialization source.
+      # Use this to bypass the pool if needed or to manually populate it.
+      # @return [MiniRacer::Context]
       def create_context
         # Use a large timeout (30s) for initialization to ensure the large Opal
         # runtime loads even if the user set a small timeout for their code.
