@@ -26,7 +26,7 @@ gem install ruby_gaurden
 ## Usage
 
 ```ruby
-# `RubyGaurden::Gaurden` is the sandbox base class. It has only the bare essentials to get the environment working.
+# `RubyGaurden::Bed` is the sandbox base class. It has only the bare essentials to get the environment working.
 class MySandbox < RubyGaurden::Bed
   # Code in the sandbox will block at most one second
   times_out_in 1 # Seconds
@@ -109,11 +109,11 @@ RubyGaurden.current #=> nil
 
 ### Inheritance
 # Sandboxes inherit configuration (uses, requires, executes, exposes) from their parents.
-class BaseSandbox < RubyGaurden::Gaurden
+class BaseSandbox < RubyGaurden::Bed
   executes '$base_initialized = true'
 end
 
-class SpecializedSandbox < RubyGaurden::Gaurden
+class SpecializedSandbox < BaseSandbox
   executes '$special_initialized = true'
 end
 

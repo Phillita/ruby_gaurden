@@ -33,19 +33,19 @@ task :benchmark do
       10_000.times { |idx| i += idx }
     end
 
-    x.report('gaurden (cold start)') do
-      # This creates a new gaurden instance and compiles the code
-      RubyGaurden::Gaurden.new.execute(code)
+    x.report('RubyGaurden::Bed (cold start)') do
+      # This creates a new bed instance and compiles the code
+      RubyGaurden::Bed.new.execute(code)
     end
 
-    x.report('gaurden (cached)') do
-      # This uses a new gaurden but hits the class-level compilation cache
-      RubyGaurden::Gaurden.new.execute(code)
+    x.report('RubyGaurden::Bed (cached)') do
+      # This uses a new bed but hits the class-level compilation cache
+      RubyGaurden::Bed.new.execute(code)
     end
 
-    x.report('gaurden (reused gaurden)') do
-      @gaurden ||= RubyGaurden::Gaurden.new
-      @gaurden.execute(code)
+    x.report('RubyGaurden::Bed (reused bed)') do
+      @bed ||= RubyGaurden::Bed.new
+      @bed.execute(code)
     end
   end
 end
