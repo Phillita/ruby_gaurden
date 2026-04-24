@@ -82,17 +82,17 @@ RSpec.describe RubyGaurden do
     expect(described_class.current).to be_nil
 
     # Inheritance
-    stub_const('BaseSandbox', Class.new(RubyGaurden::Bed) do
+    stub_const('BaseBed', Class.new(RubyGaurden::Bed) do
       executes '$base_initialized = true'
     end)
 
-    stub_const('SpecializedSandbox', Class.new(BaseSandbox) do
+    stub_const('SpecializedBed', Class.new(BaseBed) do
       executes '$special_initialized = true'
     end)
 
-    gaurden = SpecializedSandbox.new
-    expect(gaurden.execute('$base_initialized')).to be_truthy
-    expect(gaurden.execute('$special_initialized')).to be_truthy
+    bed = SpecializedBed.new
+    expect(bed.execute('$base_initialized')).to be_truthy
+    expect(bed.execute('$special_initialized')).to be_truthy
   end
 
   describe 'Caching' do
