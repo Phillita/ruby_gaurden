@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'ruby_box'
+require 'ruby_gaurden'
 require 'active_support/concern'
 require 'mini_racer'
 
-module RubyBox
+module RubyGaurden
   module Execution
     extend ActiveSupport::Concern
 

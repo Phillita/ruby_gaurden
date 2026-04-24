@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-module RubyBox
+module RubyGaurden
   VERSION = '1.0.0'
 end

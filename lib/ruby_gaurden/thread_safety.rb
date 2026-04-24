@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'ruby_box'
+require 'ruby_gaurden'
 require 'active_support/concern'
 require 'monitor'
 
-module RubyBox
+module RubyGaurden
   module ThreadSafety
     extend ActiveSupport::Concern
 

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'ruby_box'
+require 'ruby_gaurden'
 
-module RubyBox
+module RubyGaurden
   class Error < StandardError
   end
 end

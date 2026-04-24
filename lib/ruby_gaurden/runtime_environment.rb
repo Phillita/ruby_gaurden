@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'ruby_box'
+require 'ruby_gaurden'
 require 'active_support/concern'
 require 'opal'
 
-module RubyBox
+module RubyGaurden
   module RuntimeEnvironment
     extend ActiveSupport::Concern
 

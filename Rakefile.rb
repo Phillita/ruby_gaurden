@@ -5,10 +5,10 @@ require 'rspec/core/rake_task'
 
 RSpec::Core::RakeTask.new(:spec)
 
-desc 'Run console with RubyBox loaded'
+desc 'Run console with RubyGaurden loaded'
 task :console do
   require 'pry'
-  require 'ruby_box'
+  require 'ruby_gaurden'
 
   Pry.start
 end
@@ -17,7 +17,7 @@ desc 'Run benchmarks'
 task :benchmark do
   require 'benchmark'
   require 'benchmark/ips'
-  require 'ruby_box'
+  require 'ruby_gaurden'
 
   code = <<-RUBY
     i = 0
@@ -25,7 +25,7 @@ task :benchmark do
   RUBY
 
   # Warm up the cache for the cached report
-  RubyBox.execute(code)
+  RubyGaurden.execute(code)
 
   Benchmark.ips do |x|
     x.report('native') do
@@ -33,19 +33,19 @@ task :benchmark do
       10_000.times { |idx| i += idx }
     end
 
-    x.report('boxed (cold start)') do
-      # This creates a new sandbox instance and compiles the code
-      RubyBox::Metal.new.execute(code)
+    x.report('gaurden (cold start)') do
+      # This creates a new gaurden instance and compiles the code
+      RubyGaurden::Gaurden.new.execute(code)
     end
 
-    x.report('boxed (cached)') do
-      # This uses a new sandbox but hits the class-level compilation cache
-      RubyBox::Metal.new.execute(code)
+    x.report('gaurden (cached)') do
+      # This uses a new gaurden but hits the class-level compilation cache
+      RubyGaurden::Gaurden.new.execute(code)
     end
 
-    x.report('boxed (reused sandbox)') do
-      @sandbox ||= RubyBox::Metal.new
-      @sandbox.execute(code)
+    x.report('gaurden (reused gaurden)') do
+      @gaurden ||= RubyGaurden::Gaurden.new
+      @gaurden.execute(code)
     end
   end
 end

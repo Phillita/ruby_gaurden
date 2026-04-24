@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe RubyBox do
+RSpec.describe RubyGaurden do
   it 'has a version number' do
     expect(described_class::VERSION).not_to be_nil
   end
@@ -12,7 +12,7 @@ RSpec.describe RubyBox do
   end
 
   it 'behaves like the README says', :aggregate_failures do
-    stub_const('MySandbox', Class.new(RubyBox::Metal) do
+    stub_const('MySandbox', Class.new(RubyGaurden::Bed) do
       # Code in the sandbox will block at most one second
       times_out_in(1)
 
@@ -35,9 +35,9 @@ RSpec.describe RubyBox do
             @name = name
           end
 
-          # Code inside of the sandbox can get a handle on the box with `RubyBox.current` and call exposed methods
+          # Code inside of the sandbox can get a handle on the box with `RubyGaurden.current` and call exposed methods
           def self.add(a, b)
-            RubyBox.current.native_add(a, b)
+            RubyGaurden.current.native_add(a, b)
           end
         end
       RUBY
@@ -74,15 +74,15 @@ RSpec.describe RubyBox do
     another_sandbox.execute('warn "This looks dangerous"')
     expect(another_sandbox.stderr).to eq(["This looks dangerous\n"])
 
-    # Exceptions comes through as subclasses of RubyBox::BoxedError
-    expect { another_sandbox.execute('nil.no_method') }.to raise_error(RubyBox::BoxedError)
+    # Exceptions comes through as subclasses of RubyGaurden::BedError
+    expect { another_sandbox.execute('nil.no_method') }.to raise_error(RubyGaurden::BedError)
 
-    # You can determine if you are in a sandbox using `RubyBox.boxed?` and `RubyBox.current`
-    expect(described_class).not_to be_boxed
+    # You can determine if you are in a sandbox using `RubyGaurden.planted?` and `RubyGaurden.current`
+    expect(described_class).not_to be_planted
     expect(described_class.current).to be_nil
 
     # Inheritance
-    stub_const('BaseSandbox', Class.new(RubyBox::Metal) do
+    stub_const('BaseSandbox', Class.new(RubyGaurden::Bed) do
       executes '$base_initialized = true'
     end)
 
@@ -90,13 +90,13 @@ RSpec.describe RubyBox do
       executes '$special_initialized = true'
     end)
 
-    box = SpecializedSandbox.new
-    expect(box.execute('$base_initialized')).to be_truthy
-    expect(box.execute('$special_initialized')).to be_truthy
+    gaurden = SpecializedSandbox.new
+    expect(gaurden.execute('$base_initialized')).to be_truthy
+    expect(gaurden.execute('$special_initialized')).to be_truthy
   end
 
   describe 'Caching' do
-    let(:sandbox_class) { Class.new(RubyBox::Metal) }
+    let(:sandbox_class) { Class.new(RubyGaurden::Bed) }
 
     it 'caches compiled javascript for performance' do
       sandbox = sandbox_class.new
@@ -108,7 +108,7 @@ RSpec.describe RubyBox do
     end
 
     it 'evicts entries when MAX_CACHE_SIZE is reached', :aggregate_failures do
-      stub_const('RubyBox::RuntimeEnvironment::MAX_CACHE_SIZE', 2)
+      stub_const('RubyGaurden::RuntimeEnvironment::MAX_CACHE_SIZE', 2)
       sandbox = sandbox_class.new
 
       sandbox.execute('1')

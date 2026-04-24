@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'ruby_box'
+require 'ruby_gaurden'
 require 'json'
 require 'active_support/concern'
 
-module RubyBox
+module RubyGaurden
   module Bridging
     extend ActiveSupport::Concern
 
@@ -19,19 +19,19 @@ module RubyBox
         require 'singleton'
         require 'json'
 
-        module RubyBox
+        module RubyGaurden
           VERSION = #{VERSION.inspect}
 
-          class CurrentBoxProxy
+          class CurrentBedProxy
             include Singleton
           end
 
-          def self.boxed?
+          def self.planted?
             true
           end
 
           def self.current
-            CurrentBoxProxy.instance
+            CurrentBedProxy.instance
           end
 
           # Handles method invocation from the host, ensuring data is correctly
@@ -65,11 +65,11 @@ module RubyBox
 
         `
           globalThis.__rb_bridge_invoke = function(methodName, argsJson) {
-            return Opal.RubyBox.$__invoke_from_host(methodName, argsJson).$to_n();
+            return Opal.RubyGaurden.$__invoke_from_host(methodName, argsJson).$to_n();
           };
 
           globalThis.__rb_eval_wrapper = function(source) {
-            return Opal.RubyBox.$__eval_from_host(source).$to_n();
+            return Opal.RubyGaurden.$__eval_from_host(source).$to_n();
           };
         `
       RUBY
@@ -83,7 +83,7 @@ module RubyBox
 
           executes(<<-RUBY)
             # backtick_javascript: true
-            def (RubyBox::CurrentBoxProxy.instance).#{method_name}(*args, &block)
+            def (RubyGaurden::CurrentBedProxy.instance).#{method_name}(*args, &block)
               raise ArgumentError, "Blocks not supported" if block
               JSON.parse(`#{handle}(\#{args.to_json})`)
             end
@@ -121,7 +121,7 @@ module RubyBox
     rescue MiniRacer::ScriptTerminatedError => e
       raise TimeoutError, e.message
     rescue MiniRacer::RuntimeError, StandardError => e
-      raise e if e.is_a?(RubyBox::Error)
+      raise e if e.is_a?(RubyGaurden::Error)
 
       raise ExecutionError, e.message
     end
@@ -131,12 +131,12 @@ module RubyBox
 
       if result.fetch('isCaught', false)
         class_name, message = result_value(result)
-        raise BoxedError[class_name], message
+        raise BedError[class_name], message
       end
 
       result_value(result)
     rescue MiniRacer::RuntimeError, StandardError => e
-      raise e if e.is_a?(RubyBox::Error)
+      raise e if e.is_a?(RubyGaurden::Error)
 
       raise ExecutionError, e.message
     end

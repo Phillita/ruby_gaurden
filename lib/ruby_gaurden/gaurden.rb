@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'ruby_box'
+require 'ruby_gaurden'
 
-module RubyBox
-  class Metal
+module RubyGaurden
+  class Bed
     include Execution
     include RuntimeEnvironment
     include Bindings
