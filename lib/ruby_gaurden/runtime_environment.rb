@@ -45,19 +45,21 @@ module RubyGaurden
       end
 
       def initialization_source
-        @initialization_source ||= begin
-          builder = Opal::Builder.new compiler_options: { arity_check: true, dynamic_require_severity: :error }
-          builder.build 'opal'
+        @initialization_source ||= build_initialization_source
+      rescue SyntaxError, StandardError => e
+        raise CompilationError, e.message
+      end
 
-          # Ensure the builder can resolve requirements by including the gems
-          inherited_values(:@uses).uniq.each { |g| builder.use_gem g }
-          inherited_values(:@requires).uniq.each { |p| builder.build p }
-          inherited_values(:@executes).each { |s| builder.build_str s, '(executes)' }
+      def build_initialization_source
+        builder = Opal::Builder.new(compiler_options: { arity_check: true, dynamic_require_severity: :error })
+        builder.build('opal')
 
-          builder.to_s
-        rescue SyntaxError, StandardError => e
-          raise CompilationError, e.message
-        end
+        # Ensure the builder can resolve requirements by including the gems
+        inherited_values(:@uses).uniq.each { |g| builder.use_gem(g) }
+        inherited_values(:@requires).uniq.each { |p| builder.build(p) }
+        inherited_values(:@executes).each { |s| builder.build_str(s, '(executes)') }
+
+        builder.to_s
       end
 
       def inherited_values(ivar)
@@ -82,19 +84,21 @@ module RubyGaurden
     # @param source [String] Ruby source code.
     # @return [String] Compiled JavaScript.
     def compile_and_cache(source)
-      # Use the Compiler directly for the execution source to avoid V8 "Genesis" crashes.
-      js = Opal::Compiler.new(source, file: '(execute)', arity_check: true).compile
-
-      if self.class.compiled_cache.size >= MAX_CACHE_SIZE
-        # Prune the oldest 10% of entries (at least 1) to avoid performance cliffs.
-        # Since Ruby Hashes maintain insertion order, this behaves like FIFO.
-        amount_to_prune = [1, MAX_CACHE_SIZE / 10].max
-        keys_to_purge = self.class.compiled_cache.keys.first(amount_to_prune)
-        keys_to_purge.each { |k| self.class.compiled_cache.delete(k) }
-      end
-      self.class.compiled_cache[source] = js
+      prune_cache! if self.class.compiled_cache.size >= MAX_CACHE_SIZE
+      self.class.compiled_cache[source] = Opal::Compiler.new(source, file: '(execute)', arity_check: true).compile
     rescue SyntaxError => e
       raise CompilationError, e.message
+    end
+
+    # Prune the oldest 10% of entries (at least 1) to avoid performance cliffs.
+    # Since Ruby Hashes maintain insertion order, this behaves like FIFO.
+    def prune_cache!
+      self
+        .class
+        .compiled_cache
+        .keys
+        .first([1, MAX_CACHE_SIZE / 10].max)
+        .each { |k| self.class.compiled_cache.delete(k) }
     end
   end
 end
