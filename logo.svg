@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer Walled Enclosure -->
+  <path d="M100 10 L180 55 L180 145 L100 190 L20 145 L20 55 Z" fill="none" stroke="#4A5568" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M100 25 L165 62 L165 138 L100 175 L35 138 L35 62 Z" fill="none" stroke="#CBD5E0" stroke-width="2" stroke-dasharray="4 2"/>
+
+  <!-- The Ruby -->
+  <path d="M100 140 L70 100 L85 70 L115 70 L130 100 Z" fill="#E53E3E" />
+  <path d="M100 140 L115 70 L130 100 Z" fill="#C53030" />
+  <path d="M100 140 L70 100 L85 70 Z" fill="#F56565" />
+
+  <!-- The Sprout (Planted in the Ruby) -->
+  <path d="M100 80 Q100 40 120 40 Q110 60 100 80" fill="#48BB78" />
+  <path d="M100 80 Q100 50 85 50 Q95 65 100 80" fill="#38A169" />
+</svg>

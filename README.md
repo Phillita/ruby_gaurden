@@ -1,6 +1,11 @@
 # RubyGaurden
 
-RubyGaurden allows the execution of untrusted Ruby code safely in a walled garden. It works by compiling Ruby code to JavaScript using [`opal`](https://github.com/opal/opal) and executing it in [Google's V8 Engine](https://github.com/cowboyd/libv8) with some help from [`mini_racer`](https://github.com/discourse/mini_racer).
+<p align="center">
+  <img src="logo.svg" alt="RubyGaurden Logo" width="200">
+</p>
+
+
+RubyGaurden allows the execution of untrusted Ruby code safely in a shielded garden. It works by compiling Ruby code to JavaScript using [`opal`](https://github.com/opal/opal) and executing it in [Google's V8 Engine](https://github.com/cowboyd/libv8) with some help from [`mini_racer`](https://github.com/discourse/mini_racer).
 
 ## Installation
 
@@ -144,6 +149,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and pull requests are welcome on [GitHub](https://github.com/Phillita/ruby_gaurden).
 
+## Credits
+
+RubyGaurden is a rebranded fork of the original [`ruby_box`](https://github.com/anarchocurious/ruby_box) gem by Alec Larsen. It has been updated and refactored to improve performance through context pooling and enhanced thread safety.
 
 ## License
 
