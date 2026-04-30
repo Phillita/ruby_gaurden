@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['taylerphillips20@gmail.com']
 
   spec.summary       = 'RubyGaurden allows the execution of untrusted Ruby code safely in a walled garden.'
-  spec.homepage      = 'https://github.com/anarchocurious/ruby_gaurden'
+  spec.homepage      = 'https://github.com/Phillita/ruby_gaurden'
   spec.license       = 'MIT'
 
   spec.files         = Dir['lib/**/*']
