@@ -77,11 +77,15 @@ module RubyGaurden
     end
 
     def context
-      @context ||= begin
-        self.class.context_pool.pop(true)
-      rescue ThreadError
-        self.class.create_context
-      end
+      @context ||= checkout_context
+    end
+
+    private
+
+    def checkout_context
+      self.class.context_pool.pop(true)
+    rescue ThreadError
+      self.class.create_context
     end
 
     def eval_compiled_source(source)
